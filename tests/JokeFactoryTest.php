@@ -3,6 +3,10 @@
 namespace DanielChrisLucas\ChuckNorrisJokes\Tests;
 
 use DanielChrisLucas\ChuckNorrisJokes\JokeFactory;
+use GuzzleHttp\Client;
+use GuzzleHttp\Handler\MockHandler;
+use GuzzleHttp\HandlerStack;
+use GuzzleHttp\Psr7\Response;
 use PHPUnit\Framework\TestCase;
 
 class JokeFactoryTest extends TestCase
@@ -10,26 +14,23 @@ class JokeFactoryTest extends TestCase
     /** @test */
     public function it_returns_a_random_joke()
     {
-        $jokes = new JokeFactory([
-            'This is a joke',
+        $mock = new MockHandler([
+            new Response(
+                200,
+                [],
+                '{ "type": "success", "value": { "id": 323, "joke": "Chuck Norris can be unlocked on the hardest level of Tekken. But only Chuck Norris is skilled enough to unlock himself. Then he roundhouse kicks the Playstation back to Japan.", "categories": [] } }'
+            ),
         ]);
+
+        $handler = HandlerStack::create($mock);
+        $client = new Client(['handler' => $handler]);
+
+        $jokes = new JokeFactory($client);
         $joke = $jokes->getRandomJoke();
 
-        self::assertSame('This is a joke', $joke);
-    }
-
-    /** @test */
-    public function it_returns_a_predefined_joke()
-    {
-        $chuckNorrisJokes = [
-            'Chuck Norris\' tears cure cancer. Too bad he has never cried.',
-            'Chuck Norris counted to infinity... Twice.',
-            'If you can see Chuck Norris, he can see you. If you can\'t see Chuck Norris you may be only seconds away from death.',
-        ];
-
-        $jokes = new JokeFactory();
-        $joke = $jokes->getRandomJoke();
-
-        self::assertContains($joke, $chuckNorrisJokes);
+        self::assertSame(
+            'Chuck Norris can be unlocked on the hardest level of Tekken. But only Chuck Norris is skilled enough to unlock himself. Then he roundhouse kicks the Playstation back to Japan.',
+            $joke
+        );
     }
 }
