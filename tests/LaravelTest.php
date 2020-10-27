@@ -45,7 +45,7 @@ class LaravelTest extends TestCase
         ChuckNorris::shouldReceive('getRandomJoke')
             ->once()
             ->andReturn('some joke');
-        
+
         $this->get('/chuck-norris')
             ->assertStatus(200);
     }
