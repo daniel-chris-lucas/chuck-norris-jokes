@@ -4,6 +4,7 @@ namespace DanielChrisLucas\ChuckNorrisJokes\Tests;
 
 use DanielChrisLucas\ChuckNorrisJokes\ChuckNorrisJokesServiceProvider;
 use DanielChrisLucas\ChuckNorrisJokes\Facades\ChuckNorris;
+use DanielChrisLucas\ChuckNorrisJokes\Models\Joke;
 use Illuminate\Support\Facades\Artisan;
 use Orchestra\Testbench\TestCase;
 
@@ -23,6 +24,13 @@ class LaravelTest extends TestCase
         ];
     }
 
+    protected function getEnvironmentSetUp($app)
+    {
+        include_once __DIR__ . '/../database/migrations/create_jokes_table.php.stub';
+
+        (new \CreateJokesTable)->up();
+    }
+
     /** @test */
     public function the_console_command_returns_a_joke()
     {
@@ -36,7 +44,7 @@ class LaravelTest extends TestCase
 
         $output = Artisan::output();
 
-        self::assertSame('some joke'.PHP_EOL, $output);
+        self::assertSame('some joke' . PHP_EOL, $output);
     }
 
     /** @test */
@@ -50,5 +58,17 @@ class LaravelTest extends TestCase
             ->assertViewIs('chuck-norris::joke')
             ->assertViewHas('joke', 'some joke')
             ->assertStatus(200);
+    }
+
+    /** @test */
+    public function it_can_access_the_database()
+    {
+        $joke = new Joke();
+        $joke->joke = 'this is funny';
+        $joke->save();
+
+        $newJoke = Joke::find($joke->id);
+
+        $this->assertSame($newJoke->joke, 'this is funny');
     }
 }

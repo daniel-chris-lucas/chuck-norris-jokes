@@ -27,6 +27,13 @@ class ChuckNorrisJokesServiceProvider extends ServiceProvider
             __DIR__ . '/../config/chuck-norris.php' => base_path('config/chuck-norris.php'),
         ], 'chuck-norris-config');
 
+        if (! class_exists('CreateJokesTable')) {
+            $this->publishes([
+                __DIR__ . '/../database/migrations/create_jokes_table.php.stub' => database_path('migrations/'
+                    . date('Y_m_d_His') . '_create_jokes_table.php'),
+            ], 'chuck-norris-migrations');
+        }
+
         Route::get(config('chuck-norris.route'), ChuckNorrisController::class);
     }
 
