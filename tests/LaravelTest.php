@@ -36,7 +36,7 @@ class LaravelTest extends TestCase
 
         $output = Artisan::output();
 
-        self::assertSame('some joke' . PHP_EOL, $output);
+        self::assertSame('some joke'.PHP_EOL, $output);
     }
 
     /** @test */
